@@ -1,0 +1,21 @@
+api:
+  port: 5002
+  token: "secure-token-0900-0024"
+  backend_url: "http://backend:5003" 
+  timeout: 10
+
+logging:
+  log_file_path: "logs/frontend_api.log"
+  log_level: "INFO"
+
+analysis:
+  period_to_check: 7200  # in seconds
+
+thresholds:
+  latency: 10  # in milliseconds
+  latency_period: 100 # in milliseconds
+  success_error_ratio: 0.95  # 80% success threshold
+  uptime_percentage: 99.5  # Minimum uptime percentage
+
+alerts:
+  email: "alert@example.com"  # Email address for alerts

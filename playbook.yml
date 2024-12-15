@@ -1,0 +1,68 @@
+- name: Deploy Assessment Project
+  hosts: all
+  become: yes
+  vars_files:
+    - group_vars/all.yml
+    - host_vars/{{ environment }}.yml
+  tasks:
+    - name: Ensure destination directory exists
+      ansible.builtin.file:
+        path: "{{ dest_dir }}"
+        state: directory
+        mode: '0755'
+
+  tasks:
+    - name: Ensure Git is installed
+      apt:
+        name: git
+        state: present
+        update_cache: yes
+
+    - name: Ensure Docker and Docker Compose are installed
+      apt:
+        name:
+          - docker.io
+          - docker-compose
+        state: present
+        update_cache: yes
+
+    - name: Clone the GitHub repository
+      git:
+        repo: "{{ github_repo }}"
+        dest: "{{ project_dir }}"
+        version: main
+
+    - name: Ensure destination directory exists
+      ansible.builtin.file:
+        path: "{{ dest_dir }}"
+        state: directory
+        mode: '0755'
+
+    - name: Replace frontend config.yaml
+      ansible.builtin.copy:
+        src: "private_configs/{{ ansible_hostname }}_frontend_config.yaml"
+        dest: "{{ dest_dir }}/frontend_product_api/config/config.yaml"
+        mode: '0644'
+
+    - name: Replace backend config.yaml
+      ansible.builtin.copy:
+        src: "private_configs/{{ ansible_hostname }}_backend_config.yaml"
+        dest: "{{ dest_dir }}/backend_product_api/config/config.yaml"
+        mode: '0644'
+
+    - name: Run Docker Compose
+      shell: |
+        docker-compose -f {{ docker_compose_path }} up --build -d
+      args:
+        chdir: "{{ project_dir }}"
+
+    - name: Verify services are running
+      shell: |
+        docker-compose ps
+      args:
+        chdir: "{{ project_dir }}"
+      register: compose_status
+
+    - name: Print Docker Compose Status
+      debug:
+        var: compose_status.stdout

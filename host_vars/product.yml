@@ -1,0 +1,3 @@
+
+environment: "product"
+private_config: "private_configs/product_config.yaml"

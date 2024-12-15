@@ -1,0 +1,10 @@
+api:
+  port: 5003
+  token: "secure-token-0900-0024"
+
+logging:
+  log_file_path: "logs/backend_api.log"
+  log_level: "DEBUG"
+
+products:
+  path: "products/investments.json"
